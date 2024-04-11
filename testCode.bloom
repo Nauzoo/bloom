@@ -1,0 +1,33 @@
+# Testing the code in this new computer ! :) #
+
+arr cliNames = ['john', 'cloe', 'josh', 'aron'];
+arr cliAges = ['23', '19', '26', '18'];
+
+var progOpen = true;
+while progOpen {
+    var newName = read 'new client name ';
+
+    if newName != 'break' {
+        var newAge = read 'new client age ';
+
+        cliNames[size cliNames] = newName;
+        cliAges[size cliAges] = newAge;
+
+        del newName;
+        del newAge;
+    }
+    else {
+        progOpen = false;
+    }
+}
+
+var i = 0;
+if size cliNames == size cliAges {
+    while i < size cliNames {
+        write cliNames[i] + ' : ' + cliAges[i];
+        i = i + 1;
+    }
+}
+else {
+    write 'names and ages arrays must have the same size!';
+}
