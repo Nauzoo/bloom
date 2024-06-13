@@ -1,0 +1,209 @@
+
+arr board = [[' ', ' ', ' '], [' ', ' ', ' '], [' ', ' ', ' ']];
+var hWinner = false;
+
+fn () drawBoard {
+    for var lines from board {
+        write lines;
+    }
+    del lines;
+}
+
+fn (arr bd, var el) checkWinner {
+
+    # LINES #
+    if bd[0, 0] == el && bd[0, 1] == el && bd[0, 2] == el {
+        hWinner = true;
+    }
+    elsif bd[1, 0] == el && bd[1, 1] == el && bd[1, 2] == el {
+        hWinner = true;
+    }
+    elsif bd[2, 0] == el && bd[2, 1] == el && bd[2, 2] == el {
+        hWinner = true;
+    }
+
+    # COLONS #
+    elsif bd[0, 0] == el && bd[1, 0] == el && bd[2, 0] == el {
+        hWinner = true;
+    }
+    elsif bd[0, 1] == el && bd[1, 1] == el && bd[2, 1] == el {
+        hWinner = true;
+    }
+    elsif bd[0, 2] == el && bd[1, 2] == el && bd[2, 2] == el {
+        hWinner = true;
+    }
+
+    # DIAGONALS #
+    elsif bd[0, 0] == el && bd[1, 1] == el && bd[2, 2] == el {
+        hWinner = true;
+    }
+    elsif bd[0, 2] == el && bd[1, 1] == el && bd[2, 0] == el {
+        hWinner = true;
+    }
+}
+
+fn (var x, var y) setPos {
+
+    var colMax = size board[0];
+    var higMax = size board;
+
+    if x < colMax && y < higMax {
+        if board[x, y] == ' '{
+            board[x, y] = 'O';
+            plNotAns = false;
+        }
+        else {
+            write 'this place is already filled with "' + str board[x, y] + '"';
+        }
+    }
+    else {
+        write 'U have selected an out of bound position.';
+        write 'pls, select a position from (0, 0) to (2, 2)';
+        write ' ';
+    }
+
+    del x;
+    del y;
+
+}
+
+fn () machineMove {
+
+    arr machBd;
+
+    var inX = 0;
+    var inY = 0;
+
+    var foundPlace = false;
+
+    while inY < size board && !foundPlace {
+        inX = 0;
+        while inX < size board[0] && !foundPlace {
+            machBd = board;
+            if machBd[inY, inX] == ' '{
+                machBd[inY, inX] = 'X';
+            }
+            checkWinner(machBd, 'X');
+            if hWinner == true {
+                board[inY, inX] = 'X';
+                foundPlace = true;
+            }
+            inX = inX+1;
+        }
+        inY = inY+1;
+    }
+
+    if !foundPlace {
+        inY = 0;
+        while inY < size board && !foundPlace {
+            inX = 0;
+            while inX < size board[0] && !foundPlace {
+                machBd = board;
+                if machBd[inY, inX] == ' '{
+                    machBd[inY, inX] = 'O';
+                }
+                checkWinner(machBd, 'O');
+                if hWinner == true {
+                    board[inY, inX] = 'X';
+                    foundPlace = true;
+                    hWinner = false;
+                }
+                inX = inX+1;
+            }
+            inY = inY+1;
+        }
+    }
+
+    if !foundPlace {
+
+        # GET CORNERS #
+        if board[0, 0] == ' ' {
+            board[0, 0] = 'X';
+        }
+
+        elsif board[2, 2] == ' ' {
+            board[2, 2] = 'X';
+        }
+
+        elsif board[0, 2] == ' ' {
+            board[0, 2] = 'X';
+        }
+
+        elsif board[2, 0] == ' ' {
+            board[2, 0] = 'X';
+        }
+
+        # GET SIDES #
+        elsif board[2, 1] == ' ' {
+            board[2, 1] = 'X';
+        }
+
+        elsif board[1, 2] == ' ' {
+            board[1, 2] = 'X';
+        }
+
+        elsif board[0, 1] == ' ' {
+            board[0, 1] = 'X';
+        }
+
+        elsif board[1, 0] == ' ' {
+            board[1, 0] = 'X';
+        }
+
+    }
+
+    del inX;
+    del inY;
+    del foundPlace;
+}
+
+
+
+var gameRun = 4;
+var plNotAns;
+
+write 'HI, WELCOME TO "TIC-TAC-TOE"! >:)'
+write 'You, the player, use "O" and the machine will use "X".'
+drawBoard();
+write '';
+
+while gameRun > 0 {
+
+    hWinner = false;
+    plNotAns = true;
+
+    write '';
+    machineMove();
+    drawBoard();
+    write '';
+
+    checkWinner(board, 'X');
+    if !hWinner {
+        while plNotAns {
+            var xP = int read 'position x: '
+            var yP = int read 'position y: '
+            setPos(yP, xP);
+
+        }
+        checkWinner(board, 'O');
+        if hWinner {
+            write 'The player won this match!';
+            write 'Here is your prize: 8==D';
+            write '';
+            gameRun = 0
+        }
+    }
+    else {
+        write 'The machine won this match! So sad :( ...';
+        gameRun = 0;
+        write '';
+    }
+
+    gameRun = gameRun - 1;
+    if gameRun == 0 {
+        machineMove();
+        write 'DRAW!';
+    }
+
+    drawBoard();
+}
