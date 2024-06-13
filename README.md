@@ -17,14 +17,17 @@ This is a personal programming language project I'm working on. Feel free to try
 
 
 - Add the folder containig "florish.ps1" to your enviroment variables:
+
  	![env](/assets/enviroment.png)
 
 
 - You may also modify the path for your interpreter executable in "florish.ps1"
+
 	![path](/assets/exe_path.png)
 
 
 - You can now run `florish path_to_file.bloom` and start the interpreter.
+
 	![code](/assets/run_code.png)
 	- This repo already contains some code examples for you to test!
 	
