@@ -1,0 +1,15 @@
+
+code --> (FRONT-END COMPILER [LEXER -> PARSER])
+                        |
+                        Intermediate representation
+                        |
+                        V
+            (VIRTUAL MACHINE INTERPRETER)
+                        |
+                        |<- result descriptor (target machine code)
+                        Assembly code
+                        |
+                        V
+                    (ASSEMBLER) --> (LINKER) --> ELF/EXE.
+
+

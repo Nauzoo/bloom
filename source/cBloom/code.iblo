@@ -1,0 +1,34 @@
+CALLABE {
+    "bike" (->BIKE:0,string:1,short:2) => null {
+        0:color:1
+        0:price:2
+    }
+}
+
+BUILD {
+    PUSH {
+        "short",int/2,numeric
+    }
+
+    PUSH{
+        "u_int",int,numeric>=0
+    }
+
+    PUSH {
+        "BIKE",string+short+addr,
+    }
+
+    "BIKE" {
+        0:string:color
+        1:short:price
+        2:addr:bike
+    }
+
+MAIN {
+    ALLOC:int => "num"
+    ASSOC:"num" => 13
+
+    ALLOC:BIKE => "myBike"
+    ASSOC:"myBike" => CALLABE("bike", addr, "red", 400)
+
+}
