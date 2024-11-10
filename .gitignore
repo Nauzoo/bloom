@@ -225,4 +225,7 @@ dkms.conf
 *.wps
 *.bloom
 *.iblo
-# End of https://www.toptal.com/developers/gitignore/api/c,text
+
+###IDES n' text editors###
+.vscode/
+.vs/
