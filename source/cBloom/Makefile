@@ -2,11 +2,17 @@
 CC = gcc
 FLAGS = -Wall -g
 
-all: lexer callabe
+all: token lexer callabe clean
 
 callabe:
-	$(CC) $(FLAGS) lexer.o florish.c -o florish
+	$(CC) $(FLAGS) token.o lexer.o florish.c -o florish.exe
 
 lexer:
 	$(CC) $(FLAGS) -c lexer.c -o lexer.o
 
+token:
+	$(CC) $(FLAGS) -c token.c -o token.o
+
+clean:
+	del -f lexer.o
+	del -f token.o

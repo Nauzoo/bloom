@@ -23,7 +23,7 @@ BUILD {
         1:short:price
         2:addr:bike
     }
-
+}
 MAIN {
     ALLOC:int => "num"
     ASSOC:"num" => 13

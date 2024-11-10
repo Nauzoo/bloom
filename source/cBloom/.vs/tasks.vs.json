@@ -1,0 +1,15 @@
+{
+  "version": "0.2.1",
+  "tasks": [
+    {
+      "taskLabel": "tarefa-florish",
+      "appliesTo": "florish.c",
+      "type": "launch"
+    },
+    {
+      "taskLabel": "tarefa-cBloom",
+      "appliesTo": "/",
+      "type": "launch"
+    }
+  ]
+}

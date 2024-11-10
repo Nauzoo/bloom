@@ -1,5 +1,5 @@
 
-#set: (numeric) short => size(int) / 2;
+#set: (numeric) short =>size(int)/2;
 #set: (numeric >= 0) u_int => size int;
 
 struct BIKE{

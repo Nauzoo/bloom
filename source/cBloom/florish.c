@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <threads.h>
+//#include <threads.h>
 #include "lexer.h"
 
 int main(int argc, char *argv[])
@@ -17,19 +17,25 @@ int main(int argc, char *argv[])
         int fileSize = ftell(file);
         fseek(file, 0L, SEEK_SET);
 
-        char *content = (char*) calloc(fileSize, sizeof(char));
-        //char content[fileSize];
+        char *content = (char*) calloc(fileSize, sizeof(char)); // keeping a copy of the OG file.
 
-        // copying all the content of the file to a single string
+        // copying all the content from the file to a single string
         int i = 0;
-        int c;
+        char c;
         while((c = fgetc(file)) != EOF){
             content[i] = c;
             i++;
         }
 
-        tokenize(content); // pass file size ?
+        Lexer* lexer = newLexer(content, fileSize);
+        TokenList tokens = analiseSource(lexer);
+
+        //for (int i = 0; i < tokens.listSize; i++)
+        //    printToken(tokens.listpointer[i]);
     }
+
+
+
 
     //formalize the error messages with it's own struct
     else

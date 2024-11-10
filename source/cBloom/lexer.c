@@ -3,88 +3,187 @@
 #include <string.h>
 #include <stddef.h>
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
 #include <stdbool.h>
 #include <wchar.h>
 
 
-bool isInvisibleChar(char character){
-    // checking for invisible chars ' ' and '\n'
-    for (int i = 0; i < sizeof(invisibleChars); i++){
-        if (character == invisibleChars[i])
-            return true;
-    }
-    return false;
+Lexer* newLexer(char* source, size_t sourceSize) {
+    Lexer* lexerObj = malloc(sizeof(Lexer));
+    
+    lexerObj->source = source;
+    lexerObj->line = 1;
+    lexerObj->position = 0;
+    lexerObj->pinPoint = 0;
+    lexerObj->sourceSize = sourceSize;
+    lexerObj->object_size = 0;
+    return lexerObj;
 }
 
-bool isBreakChar(char character){
-    // verifying if character is a breakable
-    for (int i = 0; i < sizeof(breakChars); i++){
-        if (character == breakChars[i])
-            return true;
+void advancePosition(Lexer* lexer) {
+
+    if (lexer->position < lexer->sourceSize && lexer->source[lexer->position] != '\0') {
+        lexer->position++;
     }
-    return false;
+
 }
 
-bool isBlockChar(char character){
-    for (int i = 0; i < sizeof(blockChars); i++){
-        if (character == blockChars[i])
-            return true;
-    }
-    return false;
+char peekSource(Lexer* lexer,int offset){
+    if (lexer->position + offset < lexer->sourceSize)
+        return lexer->source[lexer->position + offset];
+    return '\0';
 }
 
-bool isOperator(char character){
-    for (int i = 0; i < sizeof(operators); i++){
-        if (character == operators[i])
-            return true;
+Token evaluateTerm(Lexer* lexer){
+
+    int indexer = 0;
+    char* buff = malloc(sizeof(char));
+    do {
+        buff[indexer] = lexer->source[lexer->position];
+        indexer++;
+        buff = (char*) realloc(buff, sizeof(char)*indexer);
+        advancePosition(lexer);
+
+    } while (iswalnum(lexer->source[lexer->position]) || lexer->source[lexer->position] == '_');
+    lexer->position--;
+    // THIS IS BALLS. Implemet a hashtable NOW!!
+    if (strcmp(buff, "set") == 0){
+        free(buff);
+        return newToken("set", TOKEN_SET_KW);
     }
-    return false;
+    else if (strcmp(buff, "struct") == 0) {
+        free(buff);
+        return newToken("struct", TOKEN_STRUCT_KW);
+    }
+    else if (strcmp(buff, "numeric") == 0) {
+        free(buff);
+        return newToken("numeric", TOKEN_NUMERIC_KW);
+    }
+    else if (strcmp(buff, "fn") == 0){
+        free(buff);
+        return newToken("fn", TOKEN_FUNCTION_KW);
+    }
+    else if (strcmp(buff, "self") == 0) {
+        free(buff);
+        return newToken("self", TOKEN_SELF_REF_KW);
+    }
+    else if (strcmp(buff, "if") == 0) {
+        free(buff);
+        return newToken("if", TOKEN_IF_KW);
+    }
+    else if (strcmp(buff, "elsif") == 0) {
+        free(buff);
+        return newToken("elsif", TOKEN_ELSIF_KW);
+    }
+    else if (strcmp(buff, "else") == 0) {
+        free(buff);
+        return newToken("else", TOKEN_ELSE_KW);
+    }
+    else if (strcmp(buff, "return") == 0) {
+        free(buff);
+        return newToken("return", TOKEN_RETURN_KW);
+    }
+    else{
+        free(buff);
+        return newToken(buff, TOKEN_IDENTIFIER);
+    } 
+
+}
+Token evaluateSymbol(Lexer* lexer, char symbol){
+
+    switch (symbol) {
+    case '+':
+        if (peekSource(lexer, 1) == '+') { advancePosition(lexer); return newToken("++", TOKEN_INCREMENT_OP); }
+        else if (peekSource(lexer, 1) == '=') { advancePosition(lexer); return newToken("+=", TOKEN_INCREMENT_OP); }
+        else return newToken("+", TOKEN_PLUS_OP);
+
+    case '-':
+        if (peekSource(lexer, 1) == '-') { advancePosition(lexer); return newToken("--", TOKEN_DECREMENT_OP); }
+        else if (peekSource(lexer, 1) == '=') { advancePosition(lexer); return newToken("-=", TOKEN_DECREMENT_OP); }
+        else if (peekSource(lexer, 1) == '>') { advancePosition(lexer); return newToken("->", TOKEN_ARROW_OP); }
+        else return newToken("-", TOKEN_PLUS_OP);
+
+    case '=':
+        if (peekSource(lexer, 1) == '=') { advancePosition(lexer); return newToken("==", TOKEN_EQUALS_OP); }
+        else return newToken("=", TOKEN_ASSIGNMENT);
+
+    case '!':
+        if (peekSource(lexer, 1) == '=') { advancePosition(lexer); return newToken("!=", TOKEN_DIFFERENT_OP); }
+        else return newToken("!", TOKEN_NOT_OP);
+
+    case '>':
+        if (peekSource(lexer, 1) == '=') { advancePosition(lexer); return newToken(">=", TOKEN_GREATER_OR_EQ_OP); }
+        else return newToken(">", TOKEN_GREATER_OP);
+
+    case '<':
+        if (peekSource(lexer, 1) == '=') { advancePosition(lexer); return newToken("<=", TOKEN_SMALLER_OR_EQ_OP); }
+        else return newToken("<", TOKEN_SMALLER_OP);
+    
+    case '*':
+        return newToken("*", TOKEN_TIMES_OP);
+    case '/':
+        return newToken("/", TOKEN_DIVISION_OP);
+    case ':':
+        return newToken(":", TOKEN_ATRIBUITION_OP);
+    case '#':
+        return newToken("#", TOKEN_HASH_OP);
+    case '.':
+        return newToken(".", TOKEN_DOT_OP);
+    case ',':
+        return newToken(",", TOKEN_COMMA);
+    case ';':
+        return newToken(";", TOKEN_SEMI_COLLON);
+    case '(':
+        return newToken("(", TOKEN_LPAR);
+    case ')':
+        return newToken(")", TOKEN_RPAR);
+    case '[':
+        return newToken("[", TOKEN_LBRACE);
+    case ']':
+        return newToken("]", TOKEN_RBRACE);
+    case '{':
+        return newToken("{", TOKEN_LCURBRACE);
+    case '}':
+        return newToken("}", TOKEN_RCURBRACE);
+    case '\0':
+        return newToken("end_of_file", TOKEN_EOF);
+    default:
+        return newToken("", TOKEN_UNKNOWN);
+    }
 }
 
-bool isSpecialChar(char character) {
-    if (isInvisibleChar(character) ||
-            isBreakChar(character) ||
-            isBlockChar(character) ||
-            isOperator(character)
-        )
-        return true;
+Token getNextToken(Lexer* lexer){
+    
+    char currentChar;
+    do {
+        advancePosition(lexer);
+        currentChar = lexer->source[lexer->position];
+        if (currentChar == '\n')
+            lexer->line++;
+    } while (iswspace(currentChar));
+    
+    if (iswalpha(currentChar)) 
+        return evaluateTerm(lexer);
     else
-        return false;
+        return evaluateSymbol(lexer, currentChar);
+    
 }
 
+TokenList analiseSource(Lexer* lexer){
+    
+    int listIndexer = 0;
+    Token* tokenList = (Token*) malloc(sizeof(Token));
 
-Token getToken(char term[]) {
-    Token tk = {term, TOKEN_KEY_WORD};
-    printf("%s\n", tk.tk_value);
-    return tk;
-}
+    Token lastToken;
+    do
+    {  
+        lastToken = getNextToken(lexer);
+        tokenList[listIndexer] = lastToken;
+        tokenList = (Token*) realloc(tokenList, (sizeof(Token) * (listIndexer + 2)));
+        listIndexer++;
+    } while ((lastToken.tk_type != TOKEN_EOF));
 
-Token* tokenize(char text[]) {
-
-    int textSize = strlen(text);
-
-    char term[20]; // TODO: check wether a term has to be limited
-    int termIndex = 0;
-    char currenChar;
-
-    for (int i = 0; i < textSize; i++){
-        currenChar = text[i];
-        if (!isSpecialChar(currenChar)){
-            term[termIndex] = currenChar;
-            termIndex++;
-        }
-        else {
-            if (strlen(term) > 0)
-                getToken(term);
-            if (!isInvisibleChar(currenChar))
-                getToken(&currenChar);
-            termIndex = 0;
-            memset(term, 0, 20); // hard coded shit
-        }
-
-    }
-
-    return NULL;
+    TokenList list = {tokenList, listIndexer};
+    return list;    
 }
 
